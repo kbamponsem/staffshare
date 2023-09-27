@@ -1,0 +1,11 @@
+# Add ignore for terraform files
+.terraform
+*.tfstate
+*.tfstate.backup
+*.hcl
+.env
+
+# Added by cargo
+
+/target
+data/

@@ -1,0 +1,9 @@
+[submodule "frontend"]
+	path = frontend
+	url = ./frontend/
+[submodule "backend"]
+	path = backend
+	url = ./backend/
+[submodule "loadbalancer"]
+	path = loadbalancer
+	url = ./loadbalancer/
