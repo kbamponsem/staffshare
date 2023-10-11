@@ -74,3 +74,8 @@ variable "staffshare_google_client_id" {
   description = "The Google client ID for OAuth"
   default = ""
 }
+
+variable "staffshare_jwt_secret" {
+  description = "The JWT secret for authentication"
+  default = ""
+}

@@ -18,19 +18,6 @@ resource "random_string" "random" {
   override_special = "/@£$"
 }
 
-# Use the random string resource to generate a JWT secret
-resource "null_resource" "jwt_secret" {
-  triggers = {
-    random_string = random_string.random.result
-  }
-
-  provisioner "local-exec" {
-    command = <<EOF
-      echo "JWT_SECRET=${random_string.random.result}" > .env
-    EOF
-  }
-}
-
 # Create a network for the containers to communicate over
 resource "docker_network" "staffshare" {
   name = "staffshare"
@@ -74,12 +61,9 @@ resource "docker_image" "backend" {
   build {
     context = var.staffshare_backend_dir
     tag     = [var.staffshare_backend_image]
+    no_cache = true
   }
-  force_remove = true
-
-  triggers = {
-    dir_hash = sha1(join(",", [for f in fileset(abspath(var.staffshare_backend_dir), "**/*.*") : filesha1("${abspath(var.staffshare_backend_dir)}/${f}")]))
-  }
+  force_remove = false
 
 }
 
@@ -88,23 +72,23 @@ resource "docker_image" "frontend" {
   build {
     context = var.staffshare_frontend_dir
     tag     = [var.staffshare_frontend_image]
+    no_cache = true
   }
-  force_remove = true
+  force_remove = false
 
-  triggers = {
-    dir_hash = sha1(join(",", [for f in fileset(abspath(var.staffshare_frontend_dir), "**/*.*") : filesha1("${abspath(var.staffshare_frontend_dir)}/${f}")]))
-  }
+
 
 }
 
 resource "docker_image" "loadbalancer" {
   name         = "nginx:latest"
   keep_locally = false
-  force_remove = true
+  force_remove = false
 
   build {
     context = var.staffshare_loadbalancer_dir
     tag     = ["nginx:latest"]
+    no_cache = true
   }
 
 }
@@ -135,7 +119,7 @@ resource "docker_container" "staffshare-backend" {
   env = [
     "STAFFSHARE_SERVER_ADDR=0.0.0.0",
     "STAFFSHARE_SERVER_PORT=${var.staffshare_backend_port}",
-    "JWT_SECRET=${random_string.random.result}",
+    "JWT_SECRET=${var.staffshare_jwt_secret}",
     "STAFFSHARE_EMAIL_ADDRESS=${var.staffshare_email_address}",
     "STAFFSHARE_EMAIL_PASSWORD=${var.staffshare_email_password}",
     "MONGODB_URI=mongodb://mongo:27017",
@@ -168,7 +152,7 @@ resource "docker_container" "staffshare-frontend" {
   env = [
     "NEXT_PUBLIC_API_URL=https://test.staffshare.co",
     "NEXTAUTH_URL=https://test.staffshare.co",
-    "JWT_SECRET=${random_string.random.result}",
+    "NEXTAUTH_SECRET=${var.staffshare_jwt_secret}",
     "GOOGLE_CLIENT_ID=${var.staffshare_google_client_id}",
     "GOOGLE_CLIENT_SECRET=${var.staffshare_google_client_secret}",
   ]
