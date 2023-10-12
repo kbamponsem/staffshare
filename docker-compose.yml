@@ -74,6 +74,10 @@ services:
     image: "mongo-express:latest"
     ports:
       - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=staffshare-db
+      - ME_CONFIG_MONGODB_PORT=27017
+
     networks:
       - staffshare
 
