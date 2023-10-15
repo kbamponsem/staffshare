@@ -1,9 +1,9 @@
 [submodule "frontend"]
 	path = frontend
-	url = ./frontend/
+	url = git@github.com:kbamponsem/staffshare-redesign.git
 [submodule "loadbalancer"]
 	path = loadbalancer
-	url = ./loadbalancer/
+	url = git@github.com:kbamponsem/staffshare-loabalancer.git
 [submodule "backend-python"]
 	path = backend-python
-	url = ./backend-python/
+	url = git@github.com:kbamponsem/staffshare-backend-python.git
